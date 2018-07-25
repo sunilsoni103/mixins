@@ -1,0 +1,242 @@
+@function remy($val) {
+    $val: $val / 16;
+    @return $val * 1rem;
+}
+
+@mixin transform($val) {
+    -webkit-transform: $val;
+    -moz-transform: $val;
+    -ms-transform: $val;
+    -o-transform: $val;
+    transform: $val;
+}
+
+@mixin position($position, $top: null, $right: null, $bottom: null, $left: null) {
+  position: $position;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+@mixin border-radius($val) {
+    border-radius: $val;
+    -webkit-border-radius: $val;
+    -moz-border-radius: $val;
+    -ms-border-radius: $val;
+    -o-border-radius: $val;
+}
+
+@mixin transition($val...) {
+    transition: $val;
+    -webkit-transition: $val;
+    -moz-transition: $val;
+    -ms-transition: $val;
+    -o-transition: $val;
+}
+
+@mixin flex-grow($val) {
+    -webkit-box-flex: $val;
+    -ms-flex-positive: $val;
+    flex-grow: $val;
+}
+
+@mixin full-container {
+    .container-fluid, [class*=col-] {
+        @include break(768px) {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+    .row {
+        @include break(768px) { margin: 0; }
+    }
+}
+
+@mixin columns($columnCount, $columnGap: normal, $columnRule: none, $columnSpan: none, $columnWidth: auto) {
+    -webkit-column-count: $columnCount;
+    -moz-column-count: $columnCount;
+    column-count: $columnCount;
+    -webkit-column-gap: $columnGap;
+    -moz-column-gap: $columnGap;
+    column-gap: $columnGap;
+    -webkit-column-rule: $columnRule;
+    -moz-column-rule: $columnRule;
+    column-rule: $columnRule;
+    -webkit-column-span: $columnSpan;
+    -moz-column-span: $columnSpan;
+    column-span: $columnSpan;
+    -webkit-column-width: $columnWidth;
+    -moz-column-width: $columnWidth;
+    column-width: $columnWidth;
+}
+
+@mixin font($font-size: 16, $line-height: 24, $font-weight: normal, $color: $color-main, $text-transform: none, $font-style: normal, $font-family: $font-main) {    
+    font-family: $font-family;
+    font-size: $font-size / 16 * 1rem;
+    line-height: $line-height / 16 * 1rem;
+    font-weight: $font-weight;
+    color: $color;
+    text-transform: $text-transform;
+    font-style: $font-style;
+}
+
+//breakpoint
+@mixin break($args...) {
+    @if length($args) == 1 {
+        @media (min-width: nth($args, 1)) {
+            @content;
+        }
+    }
+    @if length($args) == 2 {
+        @media (min-width: nth($args, 1)) and (max-width: nth($args, 2)) {
+            @content;
+        }
+    }
+}
+
+//box-shadow
+@mixin box-shadow($x, $y, $offset, $color, $inset: false) {
+    $ie-color: ie-hex-str($color);
+
+    @if $inset {
+        -webkit-box-shadow: $x $y $offset $color;
+        -moz-box-shadow: $x $y $offset $color;
+        box-shadow: $x $y $offset $color;
+    } @else {
+        -webkit-box-shadow: $x $y $offset $color;
+        -moz-box-shadow: $x $y $offset $color;
+        box-shadow: $x $y $offset $color;
+        filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=#{$x}, OffY=#{$y}, Color='#{$ie-color}');
+    }
+}
+
+
+@function strip-unit($num) {
+    @return $num / ($num * 0 + 1);
+}
+
+@mixin rem-fallback($property, $values...) {
+    $max: length($values);
+    $pxValues: '';
+    $remValues: '';
+
+    @for $i from 1 through $max {
+        $value: strip-unit(nth($values, $i));
+        $pxValues: #{$pxValues + $value*16}px;
+
+        @if $i < $max {
+            $pxValues: #{$pxValues + " "};
+        }
+    }
+
+    @for $i from 1 through $max {
+        $value: strip-unit(nth($values, $i));
+        $remValues: #{$remValues + $value}rem;
+
+        @if $i < $max {
+            $remValues: #{$remValues + " "};
+        }
+    }
+  
+    #{$property}: $pxValues; 
+    #{$property}: $remValues;
+}
+
+
+//Animation mixin setup
+@mixin keyframes($animation-name) {
+    @-webkit-keyframes #{$animation-name} {
+        @content;
+    }
+    @-moz-keyframes #{$animation-name} {
+        @content;
+    }  
+    @-ms-keyframes #{$animation-name} {
+        @content;
+    }
+    @-o-keyframes #{$animation-name} {
+        @content;
+    }  
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}
+@mixin animation($str) {
+  -webkit-animation: #{$str};
+  -moz-animation: #{$str};
+  -ms-animation: #{$str};
+  -o-animation: #{$str};
+  animation: #{$str};      
+}
+
+// @include keyframes(fade-out) {
+//   0% { opacity: 1; }
+//   90% { opacity: 0; }
+// }
+// // Add animation to element
+// .element {
+//   width: 100px;
+//   height: 100px;
+//   background: black;
+//   @include animation('fade-out 5s 3');
+// }
+
+
+//background-gradient
+@mixin background-gradient($start-color, $end-color, $orientation) { 
+    background: $start-color;
+
+    @if $orientation == 'vertical' {
+      background: -webkit-linear-gradient(top, $start-color, $end-color);
+      background: linear-gradient(to bottom, $start-color, $end-color);
+    } @else if $orientation == 'horizontal' {
+      background: -webkit-linear-gradient(left, $start-color, $end-color);
+      background: linear-gradient(to right, $start-color, $end-color);
+    } @else {
+      background: -webkit-radial-gradient(center, ellipse cover, $start-color, $end-color);
+      background: radial-gradient(ellipse at center, $start-color, $end-color);
+    }
+}
+
+//font-face
+@mixin font-face($font-name, $file-name, $weight: normal, $style: normal) { 
+  @font-face {
+    font-family: quote($font-name);
+    src: url($file-name + '.eot');
+    src: url($file-name + '.eot?#iefix')  format('embedded-opentype'),
+         url($file-name + '.woff') format('woff'),
+         url($file-name + '.ttf')  format('truetype'),
+         url($file-name + '.svg##{$font-name}')  format('svg');
+    font-weight: $weight;
+    font-style: $style;
+  }
+}
+
+
+//arrows
+@mixin arrow ($direction, $size, $color) {
+    @if $direction == up {
+        border-left: $size solid transparent;
+        border-right: $size solid transparent;
+        border-bottom: $size solid $color;
+    } @else if $direction == down {
+        border-left: $size solid transparent;
+        border-right: $size solid transparent;
+        border-top: $size solid $color;
+    } @else if $direction == right {
+        border-top: $size solid transparent;
+        border-bottom: $size solid transparent;
+        border-left: $size solid $color;
+    } @else if $direction == left {
+        border-top: $size solid transparent;
+        border-bottom: $size solid transparent;
+        border-right:$size solid $color;
+    }
+}
+
+//path for images
+@function path($src, $dir: img) {
+    $src: unquote($src);
+    @return url(unquote("..")/$dir/$src);
+}
